@@ -1,0 +1,28 @@
+{
+  "name": "home-conditions-warning-webtask",
+  "version": "1.0.0",
+  "description": "Home conditions warning notification webtask",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/HarlemSquirrel/home-conditions-warning-webtask.git"
+  },
+  "keywords": [
+    "nodejs",
+    "temperature",
+    "webtask"
+  ],
+  "author": "Kevin McCormack <harlemsquirrel@gmail.com>",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/HarlemSquirrel/home-conditions-warning-webtask/issues"
+  },
+  "homepage": "https://github.com/HarlemSquirrel/home-conditions-warning-webtask#readme",
+  "dependencies": {
+    "request": "^2.88.0",
+    "wt-cli": "^11.0.0"
+  }
+}
