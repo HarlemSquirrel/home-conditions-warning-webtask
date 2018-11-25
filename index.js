@@ -5,7 +5,6 @@ const request = require('request')
 const TwitterAdapter = require('./twitter.js')
 
 function highestHumidity(data) {
-  console.log('highestHumidity data: ' + typeof data)
   return data['temps'].map(function (row) { return Number(row['humidity']) }).sort().reverse()[0]
 }
 

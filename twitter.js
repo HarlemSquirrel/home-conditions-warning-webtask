@@ -35,11 +35,9 @@ module.exports = {
 
     if (typeof process.env.TWITTER_CONSUMER_KEY !== 'undefined') {
       // Use enviroment variables to load Twitter client when possible
-      console.log('Loading Twitter client using enviroment variables');
       loadTwitterClient(process.env)
     } else if (credentials) {
       // Use provided credentials to load Twitter client
-      console.log('credentials', credentials)
       loadTwitterClient(credentials)
       recipientID = credentials.TWITTER_USER_ID
     }
