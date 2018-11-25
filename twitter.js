@@ -1,29 +1,58 @@
-// https://developer.twitter.com/en/docs/basics/authentication/guides/authorizing-a-request
-function getRandomInt(min, max) {
-  min = Math.ceil(min);
-  max = Math.floor(max);
-  return Math.floor(Math.random() * (max - min)) + min; //The maximum is exclusive and the minimum is inclusive
-}
+const Twitter = require('twitter-lite')
+const TWITTER_DM_PATH = '/direct_messages/events/new'
+var twitterClient = null
 
-// https://developer.twitter.com/en/docs/direct-messages/sending-and-receiving/overview
-function sendTwitterDM(key, message) {
-  let oauth_nonce = getRandomInt(Math.pow(10,10),Math.pow(10,11)).toString(16)
-  let requestOptions = {
-    headers: { authorization: 'OAuth oauth_consumer_key="' + YOUR_CONSUMER_KEY + '", oauth_nonce="AUTO_GENERATED_NONCE", oauth_signature="AUTO_GENERATED_SIGNATURE", oauth_signature_method="HMAC-SHA1", oauth_timestamp="AUTO_GENERATED_TIMESTAMP", oauth_token="USERS_ACCESS_TOKEN", oauth_version="1.0"',
-               content-type: 'application/json' },
-    method: 'POST',
-    url: 'https://api.twitter.com/1.1/direct_messages/events/new.json',
-    body: {
-      event: {
-        type: 'message_create',
-        message_create: {
-          target: {
-            recipient_id: 'RECIPIENT_USER_ID'
-          },
-          message_data: { text: message }
-        }
+function directMessageParams(message, recipientID=null) {
+  return {
+    event: {
+      type: 'message_create',
+      message_create: {
+        message_data: {
+          text: message
+        },
+        target: { recipient_id: (recipientID || process.env.TWITTER_USER_ID) }
       }
     }
   }
-  request(requestOptions, function (error, response, body) {
+}
+
+function loadTwitterClient(data) {
+  // Avoid duplicate client initialization
+  if (twitterClient !== null) { return twitterClient }
+  console.log('Loading Twitter client.');
+  twitterClient = new Twitter({
+    subdomain: "api",
+    consumer_key: data.TWITTER_CONSUMER_KEY,
+    consumer_secret: data.TWITTER_CONSUMER_SECRET,
+    access_token_key: data.TWITTER_ACCESS_TOKEN_KEY,
+    access_token_secret: data.TWITTER_ACCESS_TOKEN_SECRET
+  })
+}
+
+module.exports = {
+  postDirectMesssage: function (message, credentials=null) {
+    let recipientID = null
+
+    if (typeof process.env.TWITTER_CONSUMER_KEY !== 'undefined') {
+      // Use enviroment variables to load Twitter client when possible
+      console.log('Loading Twitter client using enviroment variables');
+      loadTwitterClient(process.env)
+    } else if (credentials) {
+      // Use provided credentials to load Twitter client
+      console.log('credentials', credentials)
+      loadTwitterClient(credentials)
+      recipientID = credentials.TWITTER_USER_ID
+    }
+
+    if (twitterClient === null) throw 'Failed to load Twitter credentials!'
+
+    console.log('Sending direct message...')
+
+    twitterClient
+      .post(TWITTER_DM_PATH, directMessageParams(message, recipientID))
+      .then(function (results) {
+        console.log("Message posted!", results['event']);
+      })
+      .catch(console.error);
+  }
 }

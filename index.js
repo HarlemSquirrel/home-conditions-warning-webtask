@@ -1,5 +1,8 @@
+require('dotenv').config({ path: '.secrets' })
+
 const hoursToLookBack = 3
 const request = require('request')
+const TwitterAdapter = require('./twitter.js')
 
 function highestHumidity(data) {
   console.log('highestHumidity data: ' + typeof data)
@@ -51,8 +54,9 @@ module.exports = function (ctx, done) {
       done(error, 'Woops, that did not work!');
     } else {
       console.log('Body: ' + body)
-      data = JSON.parse(body)
-      message = warningMessages(data)
+      let data = JSON.parse(body)
+      let message = warningMessages(data)
+      TwitterAdapter.postDirectMesssage(message, ctx.data)
       done(null, message);
     }
   })
