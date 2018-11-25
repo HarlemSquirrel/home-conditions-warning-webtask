@@ -5,11 +5,13 @@ const request = require('request')
 const TwitterAdapter = require('./twitter.js')
 
 function highestHumidity(data) {
-  return data['temps'].map(function (row) { return Number(row['humidity']) }).sort().reverse()[0]
+  return data['temps'].map(function (row) { return Number(row['humidity']) })
+                      .sort().reverse()[0]
 }
 
-function highestTemp(data) {
-  return data['temps'].map(function (row) { return Number(row['tempC']) }).sort().reverse()[0]
+function lowestTemp(data) {
+  return data['temps'].map(function (row) { return Number(row['tempC']) })
+                      .sort()[0]
 }
 
 function humidityWarning(percent) {
@@ -33,9 +35,9 @@ function tempWarning(degreesC) {
 }
 
 function warningMessages(data) {
-  return [humidityWarning(highestHumidity(data)),
-          tempWarning(highestTemp(data))]
-    .join("\n")
+  let messages = [humidityWarning(highestHumidity(data)),
+                  tempWarning(lowestTemp(data))]
+  return messages.join(" ").trim()
 }
 
 module.exports = function (ctx, done) {
@@ -55,8 +57,10 @@ module.exports = function (ctx, done) {
       console.log('Body: ' + body)
       let data = JSON.parse(body)
       let message = warningMessages(data)
-      TwitterAdapter.postDirectMesssage(message, ctx.data)
-      done(null, message);
+      if (message.length > 0) {
+        TwitterAdapter.postDirectMesssage(message, ctx.data)
+      }
+      done(null, 'message: ' + message)
     }
   })
 }
