@@ -18,7 +18,7 @@ This is a companion [webtask](https://webtask.io/) for [home-conditions](https:/
 This webtask is most useful when [scheduled](https://webtask.io/docs/cron). We can schedule this to run daily at 7 AM Eastern Standard Time using the following command:
 
 ```
-wt cron create --bundle --secrets-file .secrets --schedule "* 7 * * *" --tz EST index.js
+wt cron create --bundle --secrets-file .secrets --schedule "0 7 * * *" --tz EST index.js
 ```
 
 ## Watching the logs
